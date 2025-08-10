@@ -1,0 +1,55 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: execrec
+spec:
+  version: {{ .TagName }}
+  homepage: https://github.com/keidarcy/kubectl-execrec
+  shortDescription: A kubectl plugin that wraps `kubectl exec` with session logging capabilities.
+  description: |
+    A kubectl plugin that wraps `kubectl exec` with session logging capabilities.
+    All interactive sessions are automatically logged to timestamped files for audit and debugging purposes.
+    You can also upload the log file to storage like S3.
+  platforms:
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: amd64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_darwin_amd64.tar.gz" .TagName }}
+    bin: kubectl-execrec
+  - selector:
+      matchLabels:
+        os: darwin
+        arch: arm64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_darwin_arm64.tar.gz" .TagName }}
+    bin: kubectl-execrec
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_linux_amd64.tar.gz" .TagName }}
+    bin: kubectl-execrec
+  - selector:
+      matchLabels:
+        os: linux
+        arch: amd64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_linux_amd64.tar.gz" .TagName }}
+    bin: kubectl-execrec
+  - selector:
+      matchLabels:
+        os: linux
+        arch: arm64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_linux_arm64.tar.gz" .TagName }}
+    bin: kubectl-execrec
+  - selector:
+      matchLabels:
+        os: windows
+        arch: amd64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_windows_amd64.zip" .TagName }}
+    bin: kubectl-execrec.exe
+  - selector:
+      matchLabels:
+        os: windows
+        arch: arm64
+    {{addURIAndSha "https://github.com/keidarcy/kubectl-execrec/releases/download/{{ .TagName }}/kubectl-execrec_{{ .TagName }}_windows_arm64.zip" .TagName }}
+    bin: kubectl-execrec.exe 

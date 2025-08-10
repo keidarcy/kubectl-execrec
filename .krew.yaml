@@ -5,7 +5,7 @@ metadata:
 spec:
   version: {{ .TagName }}
   homepage: https://github.com/keidarcy/kubectl-execrec
-  shortDescription: A kubectl plugin that wraps `kubectl exec` with session logging capabilities.
+  shortDescription: A kubectl plugin that wraps `kubectl exec` with session recording capabilities 📝.
   description: |
     A kubectl plugin that wraps `kubectl exec` with session logging capabilities.
     All interactive sessions are automatically logged to timestamped files for audit and debugging purposes.

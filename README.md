@@ -1,5 +1,7 @@
 # kubectl-execrec
 
+**execrec** = **exec** + **rec**order
+
 A kubectl plugin that wraps `kubectl exec` with session logging capabilities. All interactive sessions are automatically logged to timestamped files for audit and debugging purposes.
 
 ## Features

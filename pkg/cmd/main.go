@@ -56,9 +56,9 @@ func NewCmd(streams genericclioptions.IOStreams) *cobra.Command {
 		Use:     "execrec [kubectl exec args...]",
 		Version: version,
 		Short:   "Wrapper around 'kubectl exec' with session recording",
-		Long: `kubectl execrec is a wrapper around 'kubectl exec' that logs all session output to a file.
+		Long: `kubectl execrec is a wrapper around 'kubectl exec' that records all session output to a file.
 
-This command forwards all arguments to 'kubectl exec' and captures the session for logging purposes.
+This command forwards all arguments to 'kubectl exec' and captures the session for audit and debugging purposes.
 
 Examples:
   kubectl execrec -n namespace pod-name -it -- bash

@@ -2,7 +2,9 @@
 
 **execrec** = **exec** + **rec**order
 
-A kubectl plugin that wraps `kubectl exec` with session recording capabilities for audit and debugging. All interactive sessions are automatically logged to timestamped files for audit and debugging purposes with `kubectl execrec`.
+![intro-created-by-chatgpt](./.github/intro-created-by-chatgpt.png)
+
+A kubectl plugin that wraps `kubectl exec` with session recording capabilities for audit and compliance with security. All interactive sessions are automatically logged to timestamped files for audit and debugging purposes with `kubectl execrec`. [More details](https://xingyahao.com/posts/kubectl-execrec-session-recording-for-kubectl-exec-for-auditing-and-compliance-with-security/)
 
 ## Features
 

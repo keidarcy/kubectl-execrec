@@ -18,7 +18,7 @@ A kubectl plugin that wraps `kubectl exec` with session recording capabilities f
 ### Using Krew (Recommended)
 
 ```bash
-kubectl krew index add keidarcy https://github.com/keidarcy/kubectl-execrec.git
+kubectl krew index add keidarcy https://github.com/keidarcy/krew-index.git
 kubectl krew install keidarcy/execrec
 ```
 
@@ -88,9 +88,9 @@ exit
 
 ### Log File Location
 
-- **macOS**: `/var/folders/.../T/kubectl-execrec/username_timestamp.log`
-- **Linux**: `/tmp/kubectl-execrec/username_timestamp.log`
-- **Windows**: `%TEMP%\kubectl-execrec/username_timestamp.log`
+- **macOS**: `/var/folders/.../T/kubectl-execrec/context/username_timestamp.log`
+- **Linux**: `/tmp/kubectl-execrec/context/username_timestamp.log`
+- **Windows**: `%TEMP%\kubectl-execrec\context\username_timestamp.log`
 
 ### Log File Upload (Optional)
 

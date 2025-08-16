@@ -39,6 +39,8 @@ type ExecRec struct {
 	logFile *os.File
 	// username is the username of the user running the command
 	username string
+	// context is the context of the user running the command
+	context string
 
 	// cmd is the kubectl exec command
 	cmd *exec.Cmd
@@ -68,25 +70,23 @@ Examples:
 		Args:          cobra.ArbitraryArgs,
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			// Check os.TempDir()/kubectl-execrec exists
-			logDir := filepath.Join(os.TempDir(), "kubectl-execrec")
-			if _, err := os.Stat(logDir); os.IsNotExist(err) {
-				err = os.MkdirAll(logDir, 0755)
-				if err != nil {
-					return fmt.Errorf("failed to create log directory: %w", err)
-				}
-			}
-			return nil
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// Detect current context
+			context, err := detectContext(args)
+			if err != nil {
+				// Log the error but continue with default context
+				fmt.Fprintf(streams.ErrOut, "Warning: failed to detect context: %v\n", err)
+				context = "default"
+			}
+
 			rec := &ExecRec{
 				stdin:    streams.In,
 				stdout:   streams.Out,
 				stderr:   streams.ErrOut,
 				args:     args,
 				username: whoami(),
-				logDir:   filepath.Join(os.TempDir(), "kubectl-execrec"),
+				context:  context,
+				logDir:   filepath.Join(os.TempDir(), "kubectl-execrec", context),
 			}
 			if err := rec.Prepare(); err != nil {
 				return err
@@ -123,6 +123,7 @@ Examples:
 
 // Prepare log file and write header
 func (r *ExecRec) Prepare() error {
+	// Check os.TempDir()/kubectl-execrec/context exists
 	if _, err := os.Stat(r.logDir); os.IsNotExist(err) {
 		if err := os.MkdirAll(r.logDir, 0o755); err != nil {
 			return fmt.Errorf("failed to create log directory: %w", err)
@@ -141,7 +142,7 @@ func (r *ExecRec) Prepare() error {
 
 	// header
 	command := fmt.Sprintf("kubectl execrec %s", strings.Join(r.args, " "))
-	session := fmt.Sprintf("start=%s user=%s version=%s", timestamp, r.username, version)
+	session := fmt.Sprintf("start=%s user=%s context=%s version=%s", timestamp, r.username, r.context, version)
 	_, err = r.logFile.WriteString(fmt.Sprintf("[command] %s\n[session] %s\n%s\n", command, session, strings.Repeat("=", 80)))
 	if err != nil {
 		return err
@@ -288,7 +289,7 @@ func (r *ExecRec) HandleS3Upload() {
 
 	s3Bucket := os.Getenv("KUBECTL_EXECREC_S3_BUCKET")
 
-	s3Key := fmt.Sprintf("logs/%s", filepath.Base(r.logPath))
+	s3Key := fmt.Sprintf("kubectl-execrec/%s/%s", r.context, filepath.Base(r.logPath))
 	s3Args := []string{"s3", "cp", r.logPath, fmt.Sprintf("s3://%s/%s", s3Bucket, s3Key)}
 	if s3Endpoint := os.Getenv("KUBECTL_EXECREC_S3_ENDPOINT"); s3Endpoint != "" {
 		s3Args = append([]string{"--endpoint-url", s3Endpoint}, s3Args...)
@@ -336,4 +337,31 @@ func whoami() string {
 		return v
 	}
 	return "unknown"
+}
+
+// detectContext detects the current kubectl context from args or config
+func detectContext(args []string) (string, error) {
+	// First, try to extract context from --context flag in args
+	for i, arg := range args {
+		if arg == "--context" && i+1 < len(args) {
+			return args[i+1], nil
+		}
+		if strings.HasPrefix(arg, "--context=") {
+			return strings.TrimPrefix(arg, "--context="), nil
+		}
+	}
+
+	// If no context flag found, try to get current context from kubeconfig
+	configFlags := genericclioptions.NewConfigFlags(true)
+	configLoader := configFlags.ToRawKubeConfigLoader()
+	rawConfig, err := configLoader.RawConfig()
+	if err != nil {
+		return "", fmt.Errorf("failed to load kubeconfig: %w", err)
+	}
+
+	if rawConfig.CurrentContext == "" {
+		return "default", nil
+	}
+
+	return rawConfig.CurrentContext, nil
 }
